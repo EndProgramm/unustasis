@@ -88,7 +88,8 @@ flutter_launcher_icons:
   adaptive_icon_foreground_inset: 12 # default is 16
   min_sdk_android: 21 # android min sdk min:16, default 21
   ios: true
-  image_path_ios_dark_transparent: "icon/icon_monochrome.png" # transparent foreground for iOS dark mode
+  image_path_ios_dark_transparent: "icon/icon_foreground.png" # transparent foreground for iOS dark mode
+  image_path_ios_tinted_grayscale: "icon/icon_monochrome.png" # monochrome for iOS tinting
   remove_alpha_ios: true
   
 
