@@ -458,12 +458,12 @@ class _HomeScreenState extends State<HomeScreen> {
     log.info("Saved scooters: $ids");
     if (mounted && ids.isEmpty) {
       FlutterNativeSplash.remove();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const OnboardingScreen(),
-        ),
-      );
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => const OnboardingScreen(),
+      //   ),
+      // );
     } else {
       // check if we're not coming from onboarding
       if (mounted && context.read<ScooterService>().myScooter == null) {

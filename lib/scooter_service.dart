@@ -864,7 +864,7 @@ class ScooterService with ChangeNotifier {
   }
 
   Map<String, SavedScooter> getSavedScooters() {
-    Map<String, SavedScooter> scooters = {};
+    Map<String, SavedScooter> scooters = {"Achim": SavedScooter(name:"Achim", id:"1234", color: 1, lastPing: DateTime.now(), autoConnect: false, lastPrimarySOC: 1, lastSecondarySOC: 1, lastAuxSOC: 1, lastCbbSOC: 1, lastLocation: LatLng(52.458865, 13.355469))};
 
     try {
       if (prefs!.containsKey("savedScooters")) {
