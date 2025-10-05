@@ -38,7 +38,10 @@ dependencies:
   rxdart: ^0.28.0
   fluttertoast: ^8.0.8
   flutter_i18n: ^0.36.2
-  flutter_map: ^8.0.0
+  flutter_map: ^8.1.1
+  flutter_map_cancellable_tile_provider: any
+  flutter_map_location_marker: any
+  flutter_joystick: any
   geolocator: ^13.0.2
   latlong2: ^0.9.1
   nfc_manager: ^4.0.2

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:logging/logging.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../home_screen.dart';
+import '../map/tile_providers.dart';
 import '../stats/stats_screen.dart';
 import '../onboarding_screen.dart';
 import '../domain/saved_scooter.dart';
@@ -295,18 +299,18 @@ class SavedScooterCard extends StatelessWidget {
                     title: Text(
                       FlutterI18n.translate(context, "stats_last_seen_near"),
                     ),
-                    subtitle: FutureBuilder<String?>(
-                      future: GeoHelper.getAddress(savedScooter.lastLocation!, context),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return Text(snapshot.data!);
-                        } else {
-                          return Text(
-                            FlutterI18n.translate(context, "stats_no_location"),
-                          );
-                        }
-                      },
-                    ),
+                    // subtitle: FutureBuilder<String?>(
+                    //  future: GeoHelper.getAddress(//       savedScooter.lastLocation!, context),
+                    //   builder: (context, snapshot) {
+                    //     if (snapshot.hasData) {
+                    //       return Text(snapshot.data!);
+                    //     } else {
+                    //       return Text(
+                    //         FlutterI18n.translate(context, "stats_no_location"),
+                    //       );
+                    //     }
+                    //   },
+                    // ),
                     trailing: const Icon(Icons.exit_to_app_outlined),
                     onTap: () {
                       MapsLauncher.launchCoordinates(
@@ -315,6 +319,8 @@ class SavedScooterCard extends StatelessWidget {
                       );
                     },
                   ),
+                if (savedScooter.lastLocation != null && !connected)
+                  AnimatedMapControllerPage(savedScooter: savedScooter),
                 Divider(
                   indent: 16,
                   endIndent: 16,
