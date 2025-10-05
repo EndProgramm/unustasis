@@ -313,19 +313,19 @@ class SavedScooterCard extends StatelessWidget {
                     title: Text(
                       FlutterI18n.translate(context, "stats_last_seen_near"),
                     ),
-                    subtitle: FutureBuilder<String?>(
-                      future: GeoHelper.getAddress(
-                          savedScooter.lastLocation!, context),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return Text(snapshot.data!);
-                        } else {
-                          return Text(
-                            FlutterI18n.translate(context, "stats_no_location"),
-                          );
-                        }
-                      },
-                    ),
+                    // subtitle: FutureBuilder<String?>(
+                    //   future: GeoHelper.getAddress(
+                    //       savedScooter.lastLocation!, context),
+                    //   builder: (context, snapshot) {
+                    //     if (snapshot.hasData) {
+                    //       return Text(snapshot.data!);
+                    //     } else {
+                    //       return Text(
+                    //         FlutterI18n.translate(context, "stats_no_location"),
+                    //       );
+                    //     }
+                    //   },
+                    // ),
                     trailing: const Icon(Icons.exit_to_app_outlined),
                     onTap: () {
                       MapsLauncher.launchCoordinates(

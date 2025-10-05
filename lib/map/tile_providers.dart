@@ -7,8 +7,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:unustasis/domain/saved_scooter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'location_marker.dart';
-
 TileLayer get openStreetMapTileLayer => TileLayer(
       urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
       userAgentPackageName: 'dev.fleaflet.flutter_map.example',
