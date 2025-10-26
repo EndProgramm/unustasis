@@ -975,7 +975,7 @@ class ScooterService with ChangeNotifier, WidgetsBindingObserver {
       // Handle potential errors gracefully
       log.severe("Error fetching saved scooters", e, stack);
     }
-    scooters.update("Achim", (() => SavedScooter(name:"Achim", id:"1234", color: 1, lastPing: DateTime.now(), autoConnect: false, lastPrimarySOC: 1, lastSecondarySOC: 1, lastAuxSOC: 1, lastCbbSOC: 1, lastLocation: LatLng(52.458865, 13.355469))));
+    // scooters["Achim"] = SavedScooter(name:"Achim", id:"1234", color: 1, lastPing: DateTime.now(), autoConnect: false, lastPrimarySOC: 1, lastSecondarySOC: 1, lastAuxSOC: 1, lastCbbSOC: 1, lastLocation: LatLng(52.458865, 13.355469));
     return scooters;
   }
 

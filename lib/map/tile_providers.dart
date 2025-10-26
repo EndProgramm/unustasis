@@ -1,9 +1,14 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:logging/logging.dart';
 import 'package:unustasis/domain/saved_scooter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -29,36 +34,105 @@ class AnimatedMapControllerPage extends StatefulWidget {
 }
 
 
+enum GpsState {
+    off,
+    searching,
+    fixEstablished,
+    error,
+}
+
+class Standort {
+    final String zustand;
+    final double lat;
+    final double lon;
+    final double alt;
+    final double rich;
+    final double tempo;
+    final String zeit;
+
+    Standort({required this.lat, required this.lon, required this.zustand, required this.alt, required this.rich, required this.tempo, required this.zeit});
+
+    factory Standort.fromJson(Map<String, dynamic> json) {
+      return Standort(
+          zustand: json['zustand'],
+          lat: double.parse(json['lat'].toString()),
+          lon: double.parse(json['lon'].toString()),
+          alt: double.parse(json['alt'].toString()),
+          rich: double.parse(json['rich'].toString()),
+          tempo: double.parse(json['tempo'].toString()),
+          zeit: json['zeit'],
+        );
+    }
+}
+
 class AnimatedMapControllerPageState extends State<AnimatedMapControllerPage>
     with TickerProviderStateMixin {
   static const _startedId = 'AnimatedMapController#MoveStarted';
   static const _inProgressId = 'AnimatedMapController#MoveInProgress';
   static const _finishedId = 'AnimatedMapController#MoveFinished';
+  final log = Logger("ScooterMap");
 
-  static const _london = LatLng(51.5, -0.09);
-  static const _paris = LatLng(48.8566, 2.3522);
-  static const _dublin = LatLng(53.3498, -6.2603);
+  late final Timer _everySecond;
+  Key _scooterPosUpdated = UniqueKey();
+  LatLng? position;
+  double heading = 0;
+  bool headingKnown = false;
+  Color posUpdateButtonColor = Colors.blueAccent;
 
-  static const _markers = [
-    Marker(
-      width: 80,
-      height: 80,
-      point: _london,
-      child: FlutterLogo(key: ValueKey('blue')),
-    ),
-    Marker(
-      width: 80,
-      height: 80,
-      point: _dublin,
-      child: FlutterLogo(key: ValueKey('green')),
-    ),
-    Marker(
-      width: 80,
-      height: 80,
-      point: _paris,
-      child: FlutterLogo(key: ValueKey('purple')),
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+
+    position = widget.savedScooter.lastLocation;
+
+    // defines a timer
+    _everySecond = Timer.periodic(Duration(seconds: 15), (Timer t) {
+      setState(() {
+        updatePos();
+      });
+    });
+  }
+
+  void updatePos() {
+    log.info("requesting Scooter pos");
+
+    var future = fetchPos();
+
+    future.then((value) {
+      log.info("Got Standort { zustand: ${value.zustand}, lat: ${value.lat}, lon: ${value.lon}, alt: ${value.alt}, rich: ${value.rich}, tempo: ${value.tempo}, zeit: ${value.zeit} } from Server");
+      position = LatLng(value.lat, value.lon);
+      heading = value.rich;
+      if (value.rich != 0) {
+        headingKnown = true;
+      } else {
+        headingKnown = false;
+      }
+      _animatedMapMove(LatLng(value.lat, value.lon), 17);
+      posUpdateButtonColor = Colors.lightGreen;
+    }).catchError((error) {
+      log.log(Level.WARNING, "Failed to get position with error: $error");
+      posUpdateButtonColor = Colors.redAccent;
+    });
+
+    _scooterPosUpdated = UniqueKey();
+  }
+
+  Future<Standort> fetchPos() async {
+    final response = await http.get(
+      Uri.parse('https://dawn.egnetwork.de:44443/dawn/api/v1/scooter/1/pos/now'),
+    );
+
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      var parsed = Standort.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+      return parsed;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load Standort');
+    }
+  }
 
   final mapController = MapController();
 
@@ -122,14 +196,15 @@ class AnimatedMapControllerPageState extends State<AnimatedMapControllerPage>
         maxHeight: 200,
         child:
         FlutterMap(
+          mapController: mapController,
           options: MapOptions(
-            initialCenter: widget.savedScooter.lastLocation!,
+            initialCenter: position!,
             initialZoom: 17,
           ),
           children: [
             openStreetMapTileLayer,
             RichAttributionWidget(
-              // popupInitialDisplayDuration: const Duration(seconds: 5),
+              popupInitialDisplayDuration: const Duration(seconds: 2),
               animationConfig: const ScaleRAWA(),
               showFlutterMapAttribution: false,
               attributions: [
@@ -139,30 +214,19 @@ class AnimatedMapControllerPageState extends State<AnimatedMapControllerPage>
                     Uri.parse('https://openstreetmap.org/copyright'),
                   ),
                 ),
-                // const TextSourceAttribution(
-                //   'This attribution is the same throughout this app, except '
-                //   'where otherwise specified',
-                //   prependCopyright: false,
-                // ),
               ],
             ),
-            // CircleLayer(
-            //   circles: [
-            //     CircleMarker(point: widget.savedScooter.lastLocation!,
-            //         radius: 7,
-            //         useRadiusInMeter: true,
-            //         color: Colors.cyanAccent.withAlpha(150),
-            //         borderStrokeWidth: 4,
-            //         borderColor: Colors.black38,
-            //     )
-            //   ],
-            // ),
             AnimatedLocationMarkerLayer(
-              position: LocationMarkerPosition(latitude: widget.savedScooter.lastLocation!.latitude, longitude: widget.savedScooter.lastLocation!.longitude, accuracy: 30),
-              heading: LocationMarkerHeading(heading: 0, accuracy: 10),
+              key: _scooterPosUpdated,
+              position: LocationMarkerPosition(latitude: position!.latitude, longitude: position!.longitude, accuracy: 30),
+              heading: LocationMarkerHeading(heading: heading, accuracy: headingKnown ? 0.5 : 10 ),
+            ),
+            Align(
+              alignment: AttributionAlignment.bottomLeft.real,
+              child: IconButton(onPressed: updatePos, icon: Icon(Icons.refresh), color: posUpdateButtonColor,),
             ),
           ],
-        )
+        ),
       );
   }
 }

@@ -293,12 +293,12 @@ class SavedScooterCard extends StatelessWidget {
                     height: 0,
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                   ),
-                if (savedScooter.lastLocation != null && !connected)
-                  ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                    title: Text(
-                      FlutterI18n.translate(context, "stats_last_seen_near"),
-                    ),
+                // if (savedScooter.lastLocation != null && !connected)
+                //   ListTile(
+                    // contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                    // title: Text(
+                    //   FlutterI18n.translate(context, "stats_last_seen_near"),
+                    // ),
                     // subtitle: FutureBuilder<String?>(
                     //  future: GeoHelper.getAddress(//       savedScooter.lastLocation!, context),
                     //   builder: (context, snapshot) {
@@ -311,14 +311,14 @@ class SavedScooterCard extends StatelessWidget {
                     //     }
                     //   },
                     // ),
-                    trailing: const Icon(Icons.exit_to_app_outlined),
-                    onTap: () {
-                      MapsLauncher.launchCoordinates(
-                        savedScooter.lastLocation!.latitude,
-                        savedScooter.lastLocation!.longitude,
-                      );
-                    },
-                  ),
+                  //   trailing: const Icon(Icons.exit_to_app_outlined),
+                  //   onTap: () {
+                  //     MapsLauncher.launchCoordinates(
+                  //       savedScooter.lastLocation!.latitude,
+                  //       savedScooter.lastLocation!.longitude,
+                  //     );
+                  //   },
+                  // ),
                 if (savedScooter.lastLocation != null && !connected)
                   AnimatedMapControllerPage(savedScooter: savedScooter),
                 Divider(
@@ -710,33 +710,33 @@ class SavedScooterListItem extends StatelessWidget {
                             ),
                           ],
                           // Location on separate line (for disconnected scooters)
-                          if (!connected && savedScooter.lastLocation != null) ...[
-                            const SizedBox(height: 2),
-                            GestureDetector(
-                              onTap: () {
-                                MapsLauncher.launchCoordinates(
-                                  savedScooter.lastLocation!.latitude,
-                                  savedScooter.lastLocation!.longitude,
-                                );
-                              },
-                              child: FutureBuilder<String?>(
-                                future: GeoHelper.getAddress(savedScooter.lastLocation!, context),
-                                builder: (context, snapshot) {
-                                  String locationText = snapshot.hasData
-                                      ? snapshot.data!
-                                      : FlutterI18n.translate(context, "stats_no_location");
-                                  return Text(
-                                    locationText,
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: Theme.of(context).colorScheme.primary,
-                                          decoration: TextDecoration.underline,
-                                        ),
-                                    overflow: TextOverflow.ellipsis,
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
+                          // if (!connected && savedScooter.lastLocation != null) ...[
+                          //   const SizedBox(height: 2),
+                          //   GestureDetector(
+                          //     onTap: () {
+                          //       MapsLauncher.launchCoordinates(
+                          //         savedScooter.lastLocation!.latitude,
+                          //         savedScooter.lastLocation!.longitude,
+                          //       );
+                          //     },
+                          //     child: FutureBuilder<String?>(
+                          //       future: GeoHelper.getAddress(savedScooter.lastLocation!, context),
+                          //       builder: (context, snapshot) {
+                          //         String locationText = snapshot.hasData
+                          //             ? snapshot.data!
+                          //             : FlutterI18n.translate(context, "stats_no_location");
+                          //         return Text(
+                          //           locationText,
+                          //           style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          //                 color: Theme.of(context).colorScheme.primary,
+                          //                 decoration: TextDecoration.underline,
+                          //               ),
+                          //           overflow: TextOverflow.ellipsis,
+                          //         );
+                          //       },
+                          //     ),
+                          //   ),
+                          // ],
                           // Last seen timestamp at bottom (for disconnected scooters only)
                           if (!connected) ...[
                             const SizedBox(height: 4),
